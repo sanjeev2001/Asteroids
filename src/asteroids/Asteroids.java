@@ -22,7 +22,7 @@ public class Asteroids {
 
     private final JFrame frame = new JFrame("Asteroids");
     private final JPanel intro = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-    // okaodd
+    // message
 
     public static void main(String[] args) {
         Asteroids gui = new Asteroids();
