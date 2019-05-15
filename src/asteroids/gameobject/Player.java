@@ -31,7 +31,7 @@ public class Player extends GameObject implements MouseListener {
     private int mouseX;
     private int mouseY;
     private double theta = 0;
-    private double time = 0.2;
+    private double time = 0.005;
 
     public Player(Asteroids asteroids, int x, int y, double xSpeed, double ySpeed) {
         super(asteroids, x, y, xSpeed, ySpeed);
@@ -40,10 +40,18 @@ public class Player extends GameObject implements MouseListener {
         asteroids.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false), "Move down");
         asteroids.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0, false), "Move left");
         asteroids.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, false), "Move right");
-        asteroids.getActionMap().put("Move up", Movement(KeyEvent.VK_W));
-        asteroids.getActionMap().put("Move down", Movement(KeyEvent.VK_S));
-        asteroids.getActionMap().put("Move left", Movement(KeyEvent.VK_A));
-        asteroids.getActionMap().put("Move right", Movement(KeyEvent.VK_D));
+        asteroids.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, true), "W released");
+        asteroids.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, true), "S released");
+        asteroids.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0, true), "A released");
+        asteroids.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "D released");
+        asteroids.getActionMap().put("Move up", movement(KeyEvent.VK_W, false));
+        asteroids.getActionMap().put("Move down", movement(KeyEvent.VK_S, false));
+        asteroids.getActionMap().put("Move left", movement(KeyEvent.VK_A, false));
+        asteroids.getActionMap().put("Move right", movement(KeyEvent.VK_D, false));
+        asteroids.getActionMap().put("W released", movement(KeyEvent.VK_W, true));
+        asteroids.getActionMap().put("S released", movement(KeyEvent.VK_S, true));
+        asteroids.getActionMap().put("A released", movement(KeyEvent.VK_A, true));
+        asteroids.getActionMap().put("D released", movement(KeyEvent.VK_D, true));
 
     }
 
@@ -77,7 +85,6 @@ public class Player extends GameObject implements MouseListener {
         } catch (IOException ex) {
         }
 
-
         try {
             mouseX = mouse.x;
             mouseY = mouse.y;
@@ -96,47 +103,51 @@ public class Player extends GameObject implements MouseListener {
                 theta = Math.atan((Double.valueOf(mouseY - getY() + (image.getHeight() / 2))) / (Double.valueOf(mouseX - getX() - (image.getHeight() / 2)))) + Math.toRadians(90);
             }
         }
-
-        dy = 3 * Math.cos(theta);
-        dx = 3 * Math.sin(theta);
+        if ((xSpeed + time) <= 7) {
+            xSpeed += time;
+            dx += xSpeed * time + 0.5 * time * time;
+        }
+        if ((ySpeed + time) <= 7) {
+            ySpeed += time;
+            dy += ySpeed * time + 0.5 * time * time;
+        }
 
         AffineTransform at = AffineTransform.getTranslateInstance(x, y);
         at.rotate(theta, image.getWidth() / 2, image.getHeight() / 2);
         graphics2D.drawImage(image, at, asteroids);
     }
 
-    public Action Movement(int key) {
+    public Action movement(int key, boolean released) {
         return new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                switch (key) {
-                    case KeyEvent.VK_DOWN:
-                    case KeyEvent.VK_S:
-                        /*
-                        if (ySpeed + time <= 20) {
-                            ySpeed += time;
-                        }
-                        y += ySpeed * time + 0.5 * time * time;
-                        System.out.println(y + " " + ySpeed);
-                         */
-                        x -= dx;
-                        y += dy;
-                        break;
-                    case KeyEvent.VK_UP:
-                    case KeyEvent.VK_W:
-                        //ySpeed -= time;
-                        //y += ySpeed * time + 0.5 * time * time;
-                        x += dx;
-                        y -= dy;
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                    case KeyEvent.VK_D:
-                        theta += Math.toRadians(5);
-                        break;
-                    case KeyEvent.VK_LEFT:
-                    case KeyEvent.VK_A:
-                        theta -= Math.toRadians(5);
-                        break;
+                if (released == false) {
+                    switch (key) {
+                        case KeyEvent.VK_DOWN:
+                        case KeyEvent.VK_S:
+                            x -= dx * Math.sin(theta);
+                            y += dy * Math.cos(theta);
+                            break;
+                        case KeyEvent.VK_UP:
+                        case KeyEvent.VK_W:
+                            System.out.println(xSpeed);
+                            x += dx * Math.sin(theta);
+                            y -= dy * Math.cos(theta);
+                            break;
+                        case KeyEvent.VK_RIGHT:
+                        case KeyEvent.VK_D:
+                            theta += Math.toRadians(5);
+                            break;
+                        case KeyEvent.VK_LEFT:
+                        case KeyEvent.VK_A:
+                            theta -= Math.toRadians(5);
+                            break;
+                    }
+                } else {
+                    dx = 0;
+                    dy = 0;
+                    xSpeed = 5;
+                    ySpeed = 5;
                 }
             }
         };
