@@ -24,6 +24,8 @@ import javax.swing.KeyStroke;
 
 public class Player extends GameObject implements MouseListener {
 
+    private double dx;
+    private double dy;
     private BufferedImage image = null;
     private boolean mouseInside = false;
     private int mouseX;
@@ -95,7 +97,10 @@ public class Player extends GameObject implements MouseListener {
             }
         }
 
-        AffineTransform at = AffineTransform.getTranslateInstance(getX(), getY());
+        dy = 3 * Math.cos(theta);
+        dx = 3 * Math.sin(theta);
+
+        AffineTransform at = AffineTransform.getTranslateInstance(x, y);
         at.rotate(theta, image.getWidth() / 2, image.getHeight() / 2);
         graphics2D.drawImage(image, at, asteroids);
     }
@@ -107,16 +112,22 @@ public class Player extends GameObject implements MouseListener {
                 switch (key) {
                     case KeyEvent.VK_DOWN:
                     case KeyEvent.VK_S:
+                        /*
                         if (ySpeed + time <= 20) {
                             ySpeed += time;
                         }
                         y += ySpeed * time + 0.5 * time * time;
                         System.out.println(y + " " + ySpeed);
+                         */
+                        x -= dx;
+                        y += dy;
                         break;
                     case KeyEvent.VK_UP:
                     case KeyEvent.VK_W:
-                        ySpeed -= time;
-                        y += ySpeed * time + 0.5 * time * time;
+                        //ySpeed -= time;
+                        //y += ySpeed * time + 0.5 * time * time;
+                        x += dx;
+                        y -= dy;
                         break;
                     case KeyEvent.VK_RIGHT:
                     case KeyEvent.VK_D:
