@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 
 public class Asteroids extends JPanel implements Runnable {
 
-    private Player player = new Player(this, 550, 350, 0, 0);
+    private Player player = new Player(this, 550, 350, 3, 3);
     private LinkedList<GameObject> list = new LinkedList<>();
     private final JFrame frame = new JFrame("Asteroids");
     private boolean run = false;
