@@ -5,10 +5,16 @@
  */
 package asteroids.gameobject;
 
-/**
- *
- * @author Farhan
- */
-public class Enemy {
+import asteroids.Asteroids;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 
+public class Enemy extends GameObject {
+
+    public Enemy(Asteroids asteroids, int x, int y, double xSpeed, double ySpeed) {
+        super(asteroids, x, y, xSpeed, ySpeed);
+    }
+
+    public void draw(Graphics2D graphics2D) {
+    }
 }
