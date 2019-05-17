@@ -5,6 +5,7 @@
  */
 package asteroids;
 
+import asteroids.gameobject.Enemy;
 import asteroids.gameobject.GameObject;
 import asteroids.gameobject.Player;
 import java.awt.Color;
@@ -18,14 +19,17 @@ import javax.swing.JPanel;
 public class Asteroids extends JPanel implements Runnable {
 
     private Player player = new Player(this, 550, 350, 3, 3);
+    private Enemy ball = new Enemy(this, 700, 350, 3, 3);
     private LinkedList<GameObject> list = new LinkedList<>();
     private final JFrame frame = new JFrame("Asteroids");
     private boolean run = false;
 
     public Asteroids() {
+        requestFocus();
         addMouseListener(player);
         setPreferredSize(new Dimension(1100, 700));
         list.add(player);
+        list.add(ball);
         setBackground(Color.BLACK);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,7 +55,7 @@ public class Asteroids extends JPanel implements Runnable {
         while (run) {
             try {
                 repaint();
-                Thread.sleep(1);
+                Thread.sleep(17);
             } catch (Exception e) {
 
             }
