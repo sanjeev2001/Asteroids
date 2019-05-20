@@ -126,6 +126,8 @@ public class Asteroids extends Canvas implements Runnable {
     }
 
     public void tick() {
-        player.tick();
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).tick();
+        }
     }
 }
