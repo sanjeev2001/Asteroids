@@ -37,4 +37,8 @@ public class KeyboardMovement extends KeyAdapter {
         return !isDown(key) && lastKeys[key];
     }
 
+    public static boolean wasPressed(int key) {
+        return isDown(key) && !lastKeys[key];
+    }
+
 }
