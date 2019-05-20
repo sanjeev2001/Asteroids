@@ -23,7 +23,7 @@ import javax.imageio.ImageIO;
 
 public class Player extends GameObject {
 
-    private LinkedList<Ellipse2D> bullets = new LinkedList<>();
+    public LinkedList<Bullet> bullets = new LinkedList<>();
     private double dx;
     private double dy;
     private BufferedImage image = null;
@@ -41,13 +41,11 @@ public class Player extends GameObject {
 
     public void draw(Graphics2D graphics2D) {
         AffineTransform at = new AffineTransform();
-        at.setToTranslation(p.x - 11, p.y - 11);
+        at.setToTranslation(p.x - image.getWidth() / 2, p.y - image.getHeight() / 2);
         at.rotate(theta, (image.getWidth() / 2) + 1, (image.getHeight() / 2) + 1);
         graphics2D.setColor(Color.white);
-        if (MouseMovement.isClicked(MouseEvent.BUTTON1) == true) {
-            for (int i = 0; i < bullets.size(); i++) {
-                graphics2D.fill(bullets.get(i));
-            }
+        for (int i = 0; i < bullets.size(); i++) {
+            bullets.get(i).draw(graphics2D);
         }
         graphics2D.drawImage(image, at, asteroids);
     }
@@ -57,9 +55,6 @@ public class Player extends GameObject {
             switch (key) {
                 case KeyEvent.VK_DOWN:
                 case KeyEvent.VK_S:
-                    p = p.add(new Vector2D(3 * Math.sin(theta), 3 * Math.cos(theta)));
-                    //mouseClicked = true;
-                    //bullets.add(new Ellipse2D.Double(20 * Math.cos(Math.toRadians(360) - theta) + x, 20 * Math.sin(Math.toRadians(360) - theta) + y, 5, 5));
                     break;
                 case KeyEvent.VK_UP:
                 case KeyEvent.VK_W:
@@ -126,6 +121,10 @@ public class Player extends GameObject {
         }
     }
 
+    public void shoot() {
+        bullets.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - 2.5, p.y - 18 * Math.cos(theta)), theta, 0, 0));
+    }
+
     public void tick() {
         if (MouseMovement.isMouseInside()) {
             mouseMove();
@@ -142,8 +141,16 @@ public class Player extends GameObject {
             playerMovement(KeyEvent.VK_D, false);
         }
 
+        if (KeyboardMovement.wasPressed(KeyEvent.VK_SPACE)) {
+            shoot();
+        }
+
         if (KeyboardMovement.wasReleased(KeyEvent.VK_W)) {
             //playerMovement(KeyEvent.VK_W, true);
+        }
+
+        for (int i = 0; i < bullets.size(); i++) {
+            bullets.get(i).tick();
         }
     }
 }
