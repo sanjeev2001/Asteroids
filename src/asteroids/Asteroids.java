@@ -8,31 +8,33 @@ package asteroids;
 import asteroids.gameobject.Enemy;
 import asteroids.gameobject.GameObject;
 import asteroids.gameobject.Player;
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferStrategy;
 import java.util.LinkedList;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-public class Asteroids extends JPanel implements Runnable {
+public class Asteroids extends Canvas implements Runnable {
 
-    private Player player = new Player(this, 550, 350, 3, 3);
-    private Enemy ball = new Enemy(this, 700, 350, 3, 3);
+    private Player player = new Player(this, new Vector2D(550, 350), 3, 3);
+    private Enemy ball = new Enemy(this, new Vector2D(750, 350), 3, 3);
     private LinkedList<GameObject> list = new LinkedList<>();
     private final JFrame frame = new JFrame("Asteroids");
     private boolean run = false;
 
     public Asteroids() {
-        requestFocus();
-        addMouseListener(player);
-        setPreferredSize(new Dimension(1100, 700));
+        addKeyListener(new KeyboardMovement());
+        MouseMovement mListener = new MouseMovement(this);
+        addMouseListener(mListener);
+        addMouseMotionListener(mListener);
         list.add(player);
-        list.add(ball);
-        setBackground(Color.BLACK);
-        frame.setResizable(false);
+        //list.add(ball);
+        setSize(new Dimension(1100, 700));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
         frame.setVisible(true);
         frame.add(this);
         frame.pack();
@@ -43,22 +45,73 @@ public class Asteroids extends JPanel implements Runnable {
         Asteroids game = new Asteroids();
     }
 
-    public void paintComponent(Graphics graphics) {
-        super.paintComponent(graphics);
-        for (int i = 0; i < list.size(); i++) {
-            list.get(i).draw((Graphics2D) graphics);
+    public void gameRender() {
+        BufferStrategy strat = getBufferStrategy();
+
+        if (strat == null) {
+            createBufferStrategy(3);
+            return;
         }
+
+        Graphics2D g2d = (Graphics2D) strat.getDrawGraphics();
+
+        g2d.setColor(Color.black);
+        g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
+
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).draw(g2d);
+        }
+
+        g2d.dispose();
+        strat.show();
     }
 
     @Override
     public void run() {
-        while (run) {
-            try {
-                repaint();
-                Thread.sleep(17);
-            } catch (Exception e) {
+        requestFocus();
+        double targetFps = 60.0;
+        double tickrate = 1000000000.0 / targetFps;
+        long lastUpdate = System.nanoTime();
+        long timer = System.currentTimeMillis();
+        double unprocessed = 0.0;
+        int fps = 0;
+        int tps = 0;
+        boolean ableRender = false;
 
+        while (run) {
+            long now = System.nanoTime();
+            unprocessed += (now - lastUpdate) / tickrate;
+            lastUpdate = now;
+
+            MouseMovement.update();
+
+            if (unprocessed >= 1) {
+                tick();
+                KeyboardMovement.update();
+                unprocessed--;
+                tps++;
+                ableRender = true;
+            } else {
+                ableRender = false;
             }
+            try {
+                Thread.sleep(1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (ableRender) {
+                gameRender();
+                fps++;
+            }
+
+            if (System.currentTimeMillis() - 1000 > timer) {
+                timer += 1000;
+                //System.out.println("fps: " + fps + " tps: " + tps);
+                fps = 0;
+                tps = 0;
+            }
+
         }
     }
 
@@ -70,5 +123,9 @@ public class Asteroids extends JPanel implements Runnable {
 
     public void stop() {
         run = false;
+    }
+
+    public void tick() {
+        player.tick();
     }
 }
