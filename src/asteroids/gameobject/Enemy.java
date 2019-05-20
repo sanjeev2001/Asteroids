@@ -6,15 +6,20 @@
 package asteroids.gameobject;
 
 import asteroids.Asteroids;
-import java.awt.Graphics;
+import asteroids.Vector2D;
 import java.awt.Graphics2D;
 
 public class Enemy extends GameObject {
 
-    public Enemy(Asteroids asteroids, int x, int y, double xSpeed, double ySpeed) {
-        super(asteroids, x, y, xSpeed, ySpeed);
+    public Enemy(Asteroids asteroids, Vector2D p, double xSpeed, double ySpeed) {
+        super(asteroids, p, xSpeed, ySpeed);
     }
 
     public void draw(Graphics2D graphics2D) {
+    }
+
+    @Override
+    public void tick() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
