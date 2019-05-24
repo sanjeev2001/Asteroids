@@ -14,8 +14,8 @@ public class Bullet extends GameObject {
 
     double theta;
 
-    public Bullet(Asteroids asteroids, Vector2D p, double theta, double xSpeed, double ySpeed) {
-        super(asteroids, p, xSpeed, ySpeed);
+    public Bullet(Asteroids asteroids, Vector2D p, double theta, Vector2D v) {
+        super(asteroids, p, v);
         this.theta = theta;
     }
 
@@ -26,8 +26,8 @@ public class Bullet extends GameObject {
 
     @Override
     public void tick() {
-        p.x += 2 * Math.sin(theta);
-        p.y -= 2 * Math.cos(theta);
+        p.x += 3 * Math.sin(theta);
+        p.y -= 3 * Math.cos(theta);
     }
 
 }

@@ -13,14 +13,13 @@ public abstract class GameObject {
 
     protected final Asteroids asteroids;
     public Vector2D p;
-    public double xSpeed;
-    public double ySpeed;
+    public Vector2D v;
 
-    public GameObject(Asteroids asteroids, Vector2D p, double xSpeed, double ySpeed) {
+
+    public GameObject(Asteroids asteroids, Vector2D p, Vector2D v) {
         this.asteroids = asteroids;
         this.p = p;
-        this.xSpeed = xSpeed;
-        this.ySpeed = ySpeed;
+        this.v = v;
     }
 
     public abstract void draw(Graphics2D graphics2D);
@@ -34,11 +33,11 @@ public abstract class GameObject {
     }
 
     public double getXSpeed() {
-        return xSpeed;
+        return v.x;
     }
 
     public double getYSpeed() {
-        return ySpeed;
+        return v.y;
     }
 
     public abstract void tick();

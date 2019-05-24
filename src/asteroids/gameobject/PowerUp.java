@@ -11,8 +11,8 @@ import java.awt.Graphics2D;
 
 public class PowerUp extends GameObject {
 
-    public PowerUp(Asteroids asteroids, Vector2D p, double xSpeed, double ySpeed) {
-        super(asteroids, p, xSpeed, ySpeed);
+    public PowerUp(Asteroids asteroids, Vector2D p, Vector2D v) {
+        super(asteroids, p, v);
     }
 
     @Override

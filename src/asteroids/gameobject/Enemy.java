@@ -11,8 +11,8 @@ import java.awt.Graphics2D;
 
 public class Enemy extends GameObject {
 
-    public Enemy(Asteroids asteroids, Vector2D p, double xSpeed, double ySpeed) {
-        super(asteroids, p, xSpeed, ySpeed);
+    public Enemy(Asteroids asteroids, Vector2D p, Vector2D v) {
+        super(asteroids, p, v);
     }
 
     public void draw(Graphics2D graphics2D) {

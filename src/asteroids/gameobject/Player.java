@@ -31,8 +31,8 @@ public class Player extends GameObject {
     private double time = 0.005;
     Vector2D mouseVector = new Vector2D(MouseMovement.getX(), MouseMovement.getY());
 
-    public Player(Asteroids asteroids, Vector2D p, double xSpeed, double ySpeed) {
-        super(asteroids, p, xSpeed, ySpeed);
+    public Player(Asteroids asteroids, Vector2D p, Vector2D v) {
+        super(asteroids, p, v);
         try {
             image = ImageIO.read(new File("Ship.png"));
         } catch (IOException ex) {
@@ -58,7 +58,7 @@ public class Player extends GameObject {
                     break;
                 case KeyEvent.VK_UP:
                 case KeyEvent.VK_W:
-                    p = p.add(new Vector2D(3 * Math.sin(theta), -3 * Math.cos(theta)));
+                    p = p.add(new Vector2D(v.x * Math.sin(theta), -v.y * Math.cos(theta)));
 //                    if ((xSpeed + time) <= 5) {
 //                        xSpeed += time;
 //                        dx += xSpeed * time + 0.5 * time * time;
@@ -95,10 +95,7 @@ public class Player extends GameObject {
                     break;
             }
         } else {
-            dx = 0;
-            dy = 0;
-            xSpeed = 3;
-            ySpeed = 3;
+
         }
     }
 
@@ -122,7 +119,7 @@ public class Player extends GameObject {
     }
 
     public void shoot() {
-        bullets.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - 2.5, p.y - 18 * Math.cos(theta)), theta, 0, 0));
+        bullets.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - 2.5, p.y - 18 * Math.cos(theta)), theta, null));
     }
 
     public void tick() {
