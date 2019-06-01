@@ -19,7 +19,7 @@ import javax.swing.JFrame;
 
 public class Asteroids extends Canvas implements Runnable {
 
-    private Player player = new Player(this, new Vector2D(550, 350), new Vector2D(3, 3));
+    private Player player = new Player(this, new Vector2D(550, 350), new Vector2D(0, 0));
     //private Enemy ball = new Enemy(this, new Vector2D(750, 350), 3, 3);
     private LinkedList<GameObject> list = new LinkedList<>();
     private final JFrame frame = new JFrame("Asteroids");
