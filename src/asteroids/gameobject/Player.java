@@ -14,7 +14,6 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class Player extends GameObject {
     private double dy;
     private BufferedImage image = null;
     private double theta = 0;
-    private double time = 0.005;
+    private double time = 0.1;
     Vector2D mouseVector = new Vector2D(MouseMovement.getX(), MouseMovement.getY());
 
     public Player(Asteroids asteroids, Vector2D p, Vector2D v) {
@@ -51,51 +50,42 @@ public class Player extends GameObject {
     }
 
     public void playerMovement(int key, boolean released) {
+        if (p.x >= asteroids.getWidth() + image.getWidth()) {
+            p.x -= asteroids.getWidth();
+        } else if (p.x <= -image.getWidth()) {
+            p.x += asteroids.getWidth();
+        }
+
+        if (p.y >= asteroids.getHeight() + image.getHeight()) {
+            p.y -= asteroids.getHeight();
+        } else if (p.y <= -image.getWidth()) {
+            p.y += asteroids.getHeight();
+        }
+
         if (released == false) {
             switch (key) {
-                case KeyEvent.VK_DOWN:
-                case KeyEvent.VK_S:
-                    break;
                 case KeyEvent.VK_UP:
                 case KeyEvent.VK_W:
+                    //System.out.println(v.x);
+                    if (v.add(new Vector2D(time, time)).x <= 9) {
+                        v = v.add(new Vector2D(time, time));
+                    }
                     p = p.add(new Vector2D(v.x * Math.sin(theta), -v.y * Math.cos(theta)));
-//                    if ((xSpeed + time) <= 5) {
-//                        xSpeed += time;
-//                        dx += xSpeed * time + 0.5 * time * time;
-//                    }
-//                    if ((ySpeed + time) <= 5) {
-//                        ySpeed += time;
-//                        dy += ySpeed * time + 0.5 * time * time;
-//                    }
-//
-//                    if (x >= asteroids.getWidth() + image.getWidth()) {
-//                        x -= asteroids.getWidth();
-//                    } else if (x <= -image.getWidth()) {
-//                        x += asteroids.getWidth();
-//                    } else {
-//                        x += dx * Math.sin(theta);
-//                    }
-//
-//                    if (y >= asteroids.getHeight() + image.getHeight()) {
-//                        y -= asteroids.getHeight();
-//                    } else if (y <= -image.getWidth()) {
-//                        y += asteroids.getHeight();
-//                    } else {
-//                        y -= dy * Math.cos(theta);
-//                    }
-
                     break;
                 case KeyEvent.VK_RIGHT:
                 case KeyEvent.VK_D:
-                    theta += Math.toRadians(5);
+                    theta += Math.toRadians(3);
                     break;
                 case KeyEvent.VK_LEFT:
                 case KeyEvent.VK_A:
-                    theta -= Math.toRadians(5);
+                    theta -= Math.toRadians(3);
                     break;
             }
         } else {
-
+            if (v.subtract(new Vector2D(time, time)).x >= 0) {
+                v = v.subtract(new Vector2D(time, time));
+                p = p.add(new Vector2D(v.x * Math.sin(theta), -v.y * Math.cos(theta)));
+            }
         }
     }
 
@@ -119,31 +109,38 @@ public class Player extends GameObject {
     }
 
     public void shoot() {
-        bullets.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - 2.5, p.y - 18 * Math.cos(theta)), theta, null));
+        if (bullets.size() >= 5) {
+            bullets.remove(0);
+        }
+        bullets.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - (Bullet.returnRad() / 2), p.y - 18 * Math.cos(theta)), theta, new Vector2D(10, 10)));
     }
 
     public void tick() {
+        //System.out.println(lastBulletTime);
         if (MouseMovement.isMouseInside()) {
             mouseMove();
             //System.out.println(Math.toDegrees(theta));
         }
 
-        if (KeyboardMovement.isDown(KeyEvent.VK_W)) {
+        if (KeyboardMovement.isDown(KeyEvent.VK_W) || KeyboardMovement.isDown(KeyEvent.VK_UP)) {
+            if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
+                playerMovement(KeyEvent.VK_A, false);
+            } else if (KeyboardMovement.isDown(KeyEvent.VK_D) || KeyboardMovement.isDown(KeyEvent.VK_RIGHT)) {
+                playerMovement(KeyEvent.VK_D, false);
+            }
             playerMovement(KeyEvent.VK_W, false);
-        } else if (KeyboardMovement.isDown(KeyEvent.VK_S)) {
-            playerMovement(KeyEvent.VK_S, false);
-        } else if (KeyboardMovement.isDown(KeyEvent.VK_A)) {
+        } else if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
             playerMovement(KeyEvent.VK_A, false);
-        } else if (KeyboardMovement.isDown(KeyEvent.VK_D)) {
+        } else if (KeyboardMovement.isDown(KeyEvent.VK_D) || KeyboardMovement.isDown(KeyEvent.VK_RIGHT)) {
             playerMovement(KeyEvent.VK_D, false);
+        }
+
+        if (!KeyboardMovement.isDown(KeyEvent.VK_W) && !KeyboardMovement.isDown(KeyEvent.VK_UP)) {
+            playerMovement(KeyEvent.VK_W, true);
         }
 
         if (KeyboardMovement.wasPressed(KeyEvent.VK_SPACE)) {
             shoot();
-        }
-
-        if (KeyboardMovement.wasReleased(KeyEvent.VK_W)) {
-            //playerMovement(KeyEvent.VK_W, true);
         }
 
         for (int i = 0; i < bullets.size(); i++) {
