@@ -12,7 +12,9 @@ import java.awt.geom.Ellipse2D;
 
 public class Bullet extends GameObject {
 
-    double theta;
+    private double theta;
+    private static double radX = 5;
+    private static double radY = 5;
 
     public Bullet(Asteroids asteroids, Vector2D p, double theta, Vector2D v) {
         super(asteroids, p, v);
@@ -21,13 +23,28 @@ public class Bullet extends GameObject {
 
     @Override
     public void draw(Graphics2D graphics2D) {
-        graphics2D.fill(new Ellipse2D.Double(p.x, p.y, 5, 5));
+        graphics2D.fill(new Ellipse2D.Double(p.x, p.y, radX, radY));
+    }
+
+    public static double returnRad() {
+        return radX;
     }
 
     @Override
     public void tick() {
-        p.x += 3 * Math.sin(theta);
-        p.y -= 3 * Math.cos(theta);
+        if (p.x >= asteroids.getWidth() + radX) {
+            p.x -= asteroids.getWidth();
+        } else if (p.x <= -radX) {
+            p.x += asteroids.getWidth();
+        }
+
+        if (p.y >= asteroids.getHeight() + radY) {
+            p.y -= asteroids.getHeight();
+        } else if (p.y <= -radY) {
+            p.y += asteroids.getHeight();
+        }
+        p.x += v.x * Math.sin(theta);
+        p.y -= v.y * Math.cos(theta);
     }
 
 }
