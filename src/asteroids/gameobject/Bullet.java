@@ -8,6 +8,7 @@ package asteroids.gameobject;
 import asteroids.Asteroids;
 import asteroids.Vector2D;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
 
 public class Bullet extends GameObject {
@@ -23,6 +24,7 @@ public class Bullet extends GameObject {
 
     @Override
     public void draw(Graphics2D graphics2D) {
+        //graphics2D.draw(getBounds());
         graphics2D.fill(new Ellipse2D.Double(p.x, p.y, radX, radY));
     }
 
@@ -32,19 +34,23 @@ public class Bullet extends GameObject {
 
     @Override
     public void tick() {
-        if (p.x >= asteroids.getWidth() + radX) {
-            p.x -= asteroids.getWidth();
-        } else if (p.x <= -radX) {
-            p.x += asteroids.getWidth();
-        }
-
-        if (p.y >= asteroids.getHeight() + radY) {
-            p.y -= asteroids.getHeight();
-        } else if (p.y <= -radY) {
-            p.y += asteroids.getHeight();
-        }
+//        if (p.x >= asteroids.getWidth() + radX) {
+//            p.x -= asteroids.getWidth();
+//        } else if (p.x <= -radX) {
+//            p.x += asteroids.getWidth();
+//        }
+//
+//        if (p.y >= asteroids.getHeight() + radY) {
+//            p.y -= asteroids.getHeight();
+//        } else if (p.y <= -radY) {
+//            p.y += asteroids.getHeight();
+//        }
         p.x += v.x * Math.sin(theta);
         p.y -= v.y * Math.cos(theta);
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle((int) (p.x), (int) (p.y), (int) radX, (int) radY);
     }
 
 }
