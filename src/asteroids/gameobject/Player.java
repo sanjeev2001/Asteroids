@@ -11,6 +11,7 @@ import asteroids.KeyboardMovement;
 import asteroids.Vector2D;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -23,8 +24,6 @@ import javax.imageio.ImageIO;
 public class Player extends GameObject {
 
     public LinkedList<Bullet> bullets = new LinkedList<>();
-    private double dx;
-    private double dy;
     private BufferedImage image = null;
     private double theta = 0;
     private double time = 0.1;
@@ -33,7 +32,7 @@ public class Player extends GameObject {
     public Player(Asteroids asteroids, Vector2D p, Vector2D v) {
         super(asteroids, p, v);
         try {
-            image = ImageIO.read(new File("Ship.png"));
+            image = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Ship.png"));
         } catch (IOException ex) {
         }
     }
@@ -108,6 +107,10 @@ public class Player extends GameObject {
         }
     }
 
+    public LinkedList<Bullet> returnBullets() {
+        return bullets;
+    }
+
     public void shoot() {
         if (bullets.size() >= 5) {
             bullets.remove(0);
@@ -146,5 +149,9 @@ public class Player extends GameObject {
         for (int i = 0; i < bullets.size(); i++) {
             bullets.get(i).tick();
         }
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle((int) p.x - image.getWidth() / 2, (int) p.y - image.getHeight() / 2, image.getWidth(), image.getHeight());
     }
 }
