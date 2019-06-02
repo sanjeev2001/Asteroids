@@ -6,7 +6,6 @@
 package asteroids;
 
 import asteroids.gameobject.Enemy;
-import asteroids.gameobject.GameObject;
 import asteroids.gameobject.Player;
 import java.awt.Canvas;
 import java.awt.Color;
@@ -15,23 +14,23 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferStrategy;
 import java.util.LinkedList;
+import java.util.Random;
 import javax.swing.JFrame;
 
 public class Asteroids extends Canvas implements Runnable {
 
     private Player player = new Player(this, new Vector2D(550, 350), new Vector2D(0, 0));
-    //private Enemy ball = new Enemy(this, new Vector2D(750, 350), 3, 3);
-    private LinkedList<GameObject> list = new LinkedList<>();
+    private LinkedList<Enemy> enemies = new LinkedList<>();
     private final JFrame frame = new JFrame("Asteroids");
     private boolean run = false;
+    Random r = new Random();
+    public int enemyCount = 0;
 
     public Asteroids() {
         addKeyListener(new KeyboardMovement());
         MouseMovement mListener = new MouseMovement(this);
         addMouseListener(mListener);
         addMouseMotionListener(mListener);
-        list.add(player);
-        //list.add(ball);
         setSize(new Dimension(1100, 700));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
@@ -39,6 +38,34 @@ public class Asteroids extends Canvas implements Runnable {
         frame.add(this);
         frame.pack();
         start();
+    }
+
+    public void bulletCollisions() {
+        for (int i = 0; i < player.returnBullets().size(); i++) {
+            for (int j = 0; j < enemies.size(); j++) {
+                if (player.returnBullets().get(i).collidesWith(enemies.get(j))) {
+//                    if (enemies.get(j).getSize().equals("L")) {
+//                        enemyCount--;
+//                    }
+                    player.returnBullets().remove(i);
+                    enemies.get(j).explode();
+                    enemies.remove(j);
+                    if (player.returnBullets().size() == 0) {
+                        break;
+                    }
+                    i -= 1;
+
+                }
+                if (player.returnBullets().size() == 0) {
+                    break;
+                }
+            }
+        }
+    }
+
+    public void enemySpawner(String size, String type, double x, double y) {
+        enemyCount++;
+        enemies.add(new Enemy(this, new Vector2D(x, y), new Vector2D(2, 2), size));
     }
 
     public static void main(String[] args) {
@@ -57,9 +84,11 @@ public class Asteroids extends Canvas implements Runnable {
 
         g2d.setColor(Color.black);
         g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
+        
+        player.draw(g2d);
 
-        for (int i = 0; i < list.size(); i++) {
-            list.get(i).draw(g2d);
+        for (int i = 0; i < enemies.size(); i++) {
+            enemies.get(i).draw(g2d);
         }
 
         g2d.dispose();
@@ -84,6 +113,11 @@ public class Asteroids extends Canvas implements Runnable {
             lastUpdate = now;
 
             MouseMovement.update();
+            if (enemyCount == 0) {
+                enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+            }
+
+            bulletCollisions();
 
             if (unprocessed >= 1) {
                 tick();
@@ -126,8 +160,9 @@ public class Asteroids extends Canvas implements Runnable {
     }
 
     public void tick() {
-        for (int i = 0; i < list.size(); i++) {
-            list.get(i).tick();
+        player.tick();
+        for (int i = 0; i < enemies.size(); i++) {
+            enemies.get(i).tick();
         }
     }
 }
