@@ -8,6 +8,7 @@ package asteroids.gameobject;
 import asteroids.Asteroids;
 import asteroids.Vector2D;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 public class PowerUp extends GameObject {
 
@@ -21,7 +22,9 @@ public class PowerUp extends GameObject {
 
     @Override
     public void tick() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    public Rectangle getBounds() {
+        return null;
+    }
 }
