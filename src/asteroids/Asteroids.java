@@ -24,6 +24,7 @@ public class Asteroids extends Canvas implements Runnable {
     private final JFrame frame = new JFrame("Asteroids");
     private boolean run = false;
     Random r = new Random();
+    Score s = new Score(this);
     public int enemyCount = 0;
 
     public Asteroids() {
@@ -50,6 +51,7 @@ public class Asteroids extends Canvas implements Runnable {
                     player.returnBullets().remove(i);
                     enemies.get(j).explode();
                     enemies.remove(j);
+                    s.add(1);
                     if (player.returnBullets().size() == 0) {
                         break;
                     }
@@ -90,9 +92,17 @@ public class Asteroids extends Canvas implements Runnable {
         for (int i = 0; i < enemies.size(); i++) {
             enemies.get(i).draw(g2d);
         }
-
+        //s.draw(g2d);
         g2d.dispose();
         strat.show();
+    }
+
+    public void playerCollisions() {
+        for (int i = 0; i < enemies.size(); i++) {
+            if (enemies.get(i).getBounds().intersects(player.getBounds())) {
+                player.die();
+            }
+        }
     }
 
     @Override
@@ -115,9 +125,15 @@ public class Asteroids extends Canvas implements Runnable {
             MouseMovement.update();
             if (enemyCount == 0) {
                 enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
             }
 
             bulletCollisions();
+            playerCollisions();
 
             if (unprocessed >= 1) {
                 tick();
@@ -161,6 +177,7 @@ public class Asteroids extends Canvas implements Runnable {
 
     public void tick() {
         player.tick();
+        s.tick();
         for (int i = 0; i < enemies.size(); i++) {
             enemies.get(i).tick();
         }
