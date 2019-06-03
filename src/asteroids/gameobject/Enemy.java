@@ -7,7 +7,6 @@ package asteroids.gameobject;
 
 import asteroids.Asteroids;
 import asteroids.Vector2D;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
@@ -28,7 +27,7 @@ public class Enemy extends GameObject {
         this.size = size;
         Random r = new Random();
         try {
-            image = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\" + size + "_Asteroid_" + String.valueOf((int) Math.floor(Math.random() * 4) + 1) + ".png"));
+            image = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Asteroids\\" + size + "_Asteroid_" + String.valueOf((int) Math.floor(Math.random() * 4) + 1) + ".png"));
         } catch (IOException ex) {
         }
         theta = r.nextDouble() * Math.PI * 2;
