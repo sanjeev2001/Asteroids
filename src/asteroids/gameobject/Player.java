@@ -13,7 +13,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -24,17 +23,42 @@ import javax.imageio.ImageIO;
 public class Player extends GameObject {
 
     public LinkedList<Bullet> bullets = new LinkedList<>();
+    private boolean alive = true;
+    private String imageName = "";
+    private int frameNumber = 1;
     private BufferedImage image = null;
+    private int lives = 3;
+    private BufferedImage lifeImage = null;
     private double theta = 0;
+    private double t = 0;
     private double time = 0.1;
-    Vector2D mouseVector = new Vector2D(MouseMovement.getX(), MouseMovement.getY());
+    private Vector2D mouseVector = new Vector2D(MouseMovement.getX(), MouseMovement.getY());
 
     public Player(Asteroids asteroids, Vector2D p, Vector2D v) {
         super(asteroids, p, v);
+        imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Ship_" + frameNumber + ".png";
         try {
-            image = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Ship.png"));
+            image = ImageIO.read(new File(imageName));
+            lifeImage = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Ship\\Ship_1.png"));
         } catch (IOException ex) {
         }
+    }
+
+    public void die() {
+        lives--;
+        //System.out.println("test");
+//        alive = false;
+//        if (frameNumber != 8) {
+//            System.out.println(frameNumber);
+//            frameNumber++;
+//            imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Dying_" + frameNumber + ".png";
+//            try {
+//                image = ImageIO.read(new File(imageName));
+//            } catch (IOException ex) {
+//            }
+//        } else {
+//            imageName = "";
+//        }
     }
 
     public void draw(Graphics2D graphics2D) {
@@ -42,8 +66,15 @@ public class Player extends GameObject {
         at.setToTranslation(p.x - image.getWidth() / 2, p.y - image.getHeight() / 2);
         at.rotate(theta, (image.getWidth() / 2) + 1, (image.getHeight() / 2) + 1);
         graphics2D.setColor(Color.white);
+
         for (int i = 0; i < bullets.size(); i++) {
             bullets.get(i).draw(graphics2D);
+        }
+
+        if (lives > 0 && lives <= 3) {
+            for (int i = 0; i < lives; i++) {
+                graphics2D.drawImage(lifeImage, i * 26 + 5, 5, asteroids);
+            }
         }
         graphics2D.drawImage(image, at, asteroids);
     }
@@ -65,8 +96,12 @@ public class Player extends GameObject {
             switch (key) {
                 case KeyEvent.VK_UP:
                 case KeyEvent.VK_W:
+                    alive = true;
+                    if (frameNumber != 8) {
+                        frameNumber++;
+                    }
                     //System.out.println(v.x);
-                    if (v.add(new Vector2D(time, time)).x <= 9) {
+                    if (v.add(new Vector2D(time, time)).x <= 5) {
                         v = v.add(new Vector2D(time, time));
                     }
                     p = p.add(new Vector2D(v.x * Math.sin(theta), -v.y * Math.cos(theta)));
@@ -119,10 +154,18 @@ public class Player extends GameObject {
     }
 
     public void tick() {
-        //System.out.println(lastBulletTime);
+        t += 1000.0 / 60000.0;
+        if (!alive) {
+            imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Dying_" + frameNumber + ".png";
+        } else {
+            imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Ship_" + frameNumber + ".png";
+        }
+        try {
+            image = ImageIO.read(new File(imageName));
+        } catch (IOException ex) {
+        }
         if (MouseMovement.isMouseInside()) {
             mouseMove();
-            //System.out.println(Math.toDegrees(theta));
         }
 
         if (KeyboardMovement.isDown(KeyEvent.VK_W) || KeyboardMovement.isDown(KeyEvent.VK_UP)) {
@@ -139,6 +182,12 @@ public class Player extends GameObject {
         }
 
         if (!KeyboardMovement.isDown(KeyEvent.VK_W) && !KeyboardMovement.isDown(KeyEvent.VK_UP)) {
+            if (frameNumber != 1 && alive) {
+                frameNumber--;
+            } else if (frameNumber < 1 && alive) {
+                frameNumber = 1;
+            }
+
             playerMovement(KeyEvent.VK_W, true);
         }
 
@@ -154,4 +203,5 @@ public class Player extends GameObject {
     public Rectangle getBounds() {
         return new Rectangle((int) p.x - image.getWidth() / 2, (int) p.y - image.getHeight() / 2, image.getWidth(), image.getHeight());
     }
+
 }
