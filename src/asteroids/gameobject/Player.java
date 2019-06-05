@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package asteroids.gameobject;
 
 import asteroids.Asteroids;
@@ -12,6 +7,8 @@ import asteroids.Vector2D;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -19,19 +16,23 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import javax.imageio.ImageIO;
+import javax.swing.Timer;
 
 public class Player extends GameObject {
 
-    public LinkedList<Bullet> bullets = new LinkedList<>();
     private boolean alive = true;
+    private LinkedList<Bullet> bullets = new LinkedList<>();
+    private LinkedList<Bullet> bombs = new LinkedList<>();
+    private BufferedImage bombImage = null;
     private String imageName = "";
     private int frameNumber = 1;
     private BufferedImage image = null;
     private int lives = 3;
     private BufferedImage lifeImage = null;
+    private int numberOfBombs = 2;
     private double theta = 0;
-    private double t = 0;
     private double time = 0.1;
+    private Timer timer;
     private Vector2D mouseVector = new Vector2D(MouseMovement.getX(), MouseMovement.getY());
 
     public Player(Asteroids asteroids, Vector2D p, Vector2D v) {
@@ -40,25 +41,23 @@ public class Player extends GameObject {
         try {
             image = ImageIO.read(new File(imageName));
             lifeImage = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Ship\\Ship_1.png"));
+            bombImage = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\Bomb_Icon.png"));
         } catch (IOException ex) {
         }
     }
 
+    public void applyPowerUp(String type) {
+        if (type.equals("Health")) {
+            lives += 1;
+        } else {
+            numberOfBombs += 1;
+        }
+    }
+
     public void die() {
+        alive = false;
+        dyingAnimation();
         lives--;
-        //System.out.println("test");
-//        alive = false;
-//        if (frameNumber != 8) {
-//            System.out.println(frameNumber);
-//            frameNumber++;
-//            imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Dying_" + frameNumber + ".png";
-//            try {
-//                image = ImageIO.read(new File(imageName));
-//            } catch (IOException ex) {
-//            }
-//        } else {
-//            imageName = "";
-//        }
     }
 
     public void draw(Graphics2D graphics2D) {
@@ -71,12 +70,61 @@ public class Player extends GameObject {
             bullets.get(i).draw(graphics2D);
         }
 
+        for (int i = 0; i < bombs.size(); i++) {
+            bombs.get(i).draw(graphics2D);
+        }
+
         if (lives > 0 && lives <= 3) {
             for (int i = 0; i < lives; i++) {
                 graphics2D.drawImage(lifeImage, i * 26 + 5, 5, asteroids);
             }
         }
+
+        if (numberOfBombs > 0 && numberOfBombs <= 3) {
+            for (int i = 0; i < numberOfBombs; i++) {
+                graphics2D.drawImage(bombImage, i * 26 + 5, 31, asteroids);
+            }
+        }
         graphics2D.drawImage(image, at, asteroids);
+    }
+
+    public void dyingAnimation() {
+        ActionListener ac = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Dying_" + frameNumber + ".png";
+                try {
+                    image = ImageIO.read(new File(imageName));
+                } catch (IOException ex) {
+                }
+                frameNumber++;
+                if (frameNumber > 8) {
+                    timer.stop();
+                }
+            }
+        };
+        timer = new Timer(60, ac);
+        timer.start();
+    }
+
+    public LinkedList<Bullet> getBombs() {
+        return bombs;
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle((int) p.x - image.getWidth() / 2, (int) p.y - image.getHeight() / 2, image.getWidth(), image.getHeight());
+    }
+
+    public LinkedList<Bullet> getBullets() {
+        return bullets;
+    }
+
+    public int getPowerUpNumber(String type) {
+        return type.equals("Health") ? lives : numberOfBombs;
+    }
+
+    public boolean isAlive() {
+        return alive;
     }
 
     public void playerMovement(int key, boolean released) {
@@ -142,66 +190,71 @@ public class Player extends GameObject {
         }
     }
 
-    public LinkedList<Bullet> returnBullets() {
-        return bullets;
-    }
-
-    public void shoot() {
-        if (bullets.size() >= 5) {
-            bullets.remove(0);
+    public void shoot(String type) {
+        if (type.equals("Bullet")) {
+            if (bullets.size() >= 5) {
+                bullets.remove(0);
+            }
+            bullets.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - (Bullet.returnRad() / 2), p.y - 18 * Math.cos(theta)), theta, new Vector2D(10, 10), type));
+        } else {
+            bombs.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - (Bullet.returnRad() / 2), p.y - 18 * Math.cos(theta)), theta, new Vector2D(2, 2), type));
+            bombs.get(bombs.size() - 1).bombTimer("Flashing");
         }
-        bullets.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - (Bullet.returnRad() / 2), p.y - 18 * Math.cos(theta)), theta, new Vector2D(10, 10)));
     }
 
     public void tick() {
-        t += 1000.0 / 60000.0;
-        if (!alive) {
-            imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Dying_" + frameNumber + ".png";
-        } else {
+        if (alive) {
             imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Ship_" + frameNumber + ".png";
-        }
-        try {
-            image = ImageIO.read(new File(imageName));
-        } catch (IOException ex) {
-        }
-        if (MouseMovement.isMouseInside()) {
-            mouseMove();
-        }
+            try {
+                image = ImageIO.read(new File(imageName));
+            } catch (IOException ex) {
+            }
+            if (MouseMovement.isMouseInside()) {
+                mouseMove();
+            }
 
-        if (KeyboardMovement.isDown(KeyEvent.VK_W) || KeyboardMovement.isDown(KeyEvent.VK_UP)) {
-            if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
+            if (KeyboardMovement.isDown(KeyEvent.VK_W) || KeyboardMovement.isDown(KeyEvent.VK_UP)) {
+                if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
+                    playerMovement(KeyEvent.VK_A, false);
+                } else if (KeyboardMovement.isDown(KeyEvent.VK_D) || KeyboardMovement.isDown(KeyEvent.VK_RIGHT)) {
+                    playerMovement(KeyEvent.VK_D, false);
+                }
+                playerMovement(KeyEvent.VK_W, false);
+            } else if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
                 playerMovement(KeyEvent.VK_A, false);
             } else if (KeyboardMovement.isDown(KeyEvent.VK_D) || KeyboardMovement.isDown(KeyEvent.VK_RIGHT)) {
                 playerMovement(KeyEvent.VK_D, false);
             }
-            playerMovement(KeyEvent.VK_W, false);
-        } else if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
-            playerMovement(KeyEvent.VK_A, false);
-        } else if (KeyboardMovement.isDown(KeyEvent.VK_D) || KeyboardMovement.isDown(KeyEvent.VK_RIGHT)) {
-            playerMovement(KeyEvent.VK_D, false);
-        }
 
-        if (!KeyboardMovement.isDown(KeyEvent.VK_W) && !KeyboardMovement.isDown(KeyEvent.VK_UP)) {
-            if (frameNumber != 1 && alive) {
-                frameNumber--;
-            } else if (frameNumber < 1 && alive) {
-                frameNumber = 1;
+            if (!KeyboardMovement.isDown(KeyEvent.VK_W) && !KeyboardMovement.isDown(KeyEvent.VK_UP)) {
+                if (frameNumber != 1 && alive) {
+                    frameNumber--;
+                } else if (frameNumber < 1 && alive) {
+                    frameNumber = 1;
+                }
+
+                playerMovement(KeyEvent.VK_W, true);
             }
 
-            playerMovement(KeyEvent.VK_W, true);
-        }
+            if (KeyboardMovement.wasPressed(KeyEvent.VK_SPACE)) {
+                shoot("Bullet");
+            }
 
-        if (KeyboardMovement.wasPressed(KeyEvent.VK_SPACE)) {
-            shoot();
-        }
+            if (KeyboardMovement.wasPressed(KeyEvent.VK_B)) {
+                if (numberOfBombs >= 1) {
+                    numberOfBombs--;
+                    shoot("Bomb");
+                }
+            }
 
-        for (int i = 0; i < bullets.size(); i++) {
-            bullets.get(i).tick();
-        }
-    }
+            for (int i = 0; i < bullets.size(); i++) {
+                bullets.get(i).tick();
+            }
 
-    public Rectangle getBounds() {
-        return new Rectangle((int) p.x - image.getWidth() / 2, (int) p.y - image.getHeight() / 2, image.getWidth(), image.getHeight());
+            for (int i = 0; i < bombs.size(); i++) {
+                bombs.get(i).tick();
+            }
+        }
     }
 
 }
