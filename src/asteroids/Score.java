@@ -6,6 +6,7 @@
 package asteroids;
 
 import asteroids.Asteroids;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics2D;
@@ -27,6 +28,7 @@ public class Score {
         } catch (IOException ex) {
             System.out.println("Font not found");
         }
+        asteroids.setFont(f);
     }
 
     public void add(int x) {
@@ -34,12 +36,8 @@ public class Score {
     }
 
     public void draw(Graphics2D graphics2D) {
-        asteroids.setFont(f);
+        graphics2D.setColor(Color.WHITE);
         graphics2D.drawString(String.valueOf(value), (int) (1100 - graphics2D.getFontMetrics(f).getStringBounds(String.valueOf(value), graphics2D).getWidth()), (int) (5 + graphics2D.getFontMetrics(f).getHeight()));
-    }
-
-    public void tick() {
-
     }
 
 }
