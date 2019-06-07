@@ -27,7 +27,7 @@ public class MainMenu extends JPanel {
         this.asteroids = asteroids;
         this.setLayout(null);
         this.setPreferredSize(new Dimension(1100, 700));
-        title.setBounds(1100 / 2 - 550 / 2, 125, 550, 120);
+        title.setBounds(1100 / 2 - 550 / 2, 125, 550, 120);//Sets component size and location
         pane.setBounds(0, 0, 1100, 700);
         bg.setBounds(0, 0, 1100, 700);
         play.setBounds(1100 / 2 - 200 / 2, 300, 200, 60);
@@ -36,8 +36,8 @@ public class MainMenu extends JPanel {
         Sound sound = new Sound("intro");
 
         try {
-            bg.setIcon(new ImageIcon(this.getClass().getResource("titlescreen.gif")));
-            title.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\title.png"))));
+            bg.setIcon(new ImageIcon(this.getClass().getResource("titlescreen.gif"))); //Displays image on JLabel
+            title.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\title.png")))); //Setting image for each button
             play.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\play.png"))));
             leader.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\leader.png"))));
             quit.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\quit.png"))));
