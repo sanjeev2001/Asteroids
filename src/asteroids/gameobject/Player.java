@@ -214,6 +214,7 @@ public class Player extends GameObject {
 
     public void respawn() {
         //makes sure the player can't lose all lives at once
+        Sound ded = new Sound("pls");
         bullets = new LinkedList<>();
         alive = false;
         invincible = true;

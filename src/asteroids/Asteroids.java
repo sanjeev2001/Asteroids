@@ -168,7 +168,6 @@ public class Asteroids extends Canvas implements Runnable {
     public void playerCollisions() {
         for (int i = 0; i < enemies.size(); i++) {
             if (enemies.get(i).getBounds().intersects(player.getBounds()) && player.isAlive() && !player.isInvincible()) {
-                Sound ded = new Sound("ded");
                 if (player.getLives() - 1 > 0) {
                     player.respawn();
                 } else {
