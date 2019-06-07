@@ -13,11 +13,13 @@ public class Vector2D {
     public double y;
 
     public Vector2D(double x, double y) {
+        //set coordinates
         this.x = x;
         this.y = y;
     }
 
     public Vector2D(Point p) {
+        //sets speed and direction
         this.x = p.x;
         this.y = p.y;
     }
