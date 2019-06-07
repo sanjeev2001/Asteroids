@@ -21,7 +21,7 @@ public class Sound {
 
     public Sound(String name) {
         try {
-            clip = AudioSystem.getClip(); creates a clip object
+            clip = AudioSystem.getClip(); //creates a clip object
             AudioInputStream ais = AudioSystem.getAudioInputStream((new File(System.getProperty("user.dir") + "\\Audio\\" + name + ".wav")));//gets file from folder
             clip.open(ais);//opens the stream
             clip.start();//starts the stream

@@ -24,6 +24,7 @@ public class Asteroids extends Canvas implements Runnable {
     private Random r = new Random();
     private Score s = new Score(this);
     public int enemyCount = 0;
+    private GameOverPanel panel;
 
     public Asteroids() {
         MainMenu mm = new MainMenu(this, frame);
@@ -45,9 +46,9 @@ public class Asteroids extends Canvas implements Runnable {
                 if (player.getBullets().get(i).collidesWith(enemies.get(j))) {
                     Sound hit = new Sound("hit");
                     s.add(enemies.get(j).returnScore());
-                    enemyCount--;
                     if (enemies.get(j).getSize().equals("S")) {
-                        powerUpSpawner("Bomb", enemies.get(j).getX(), enemies.get(j).getY());
+                        enemyCount--;
+                        powerUpSpawner(enemies.get(j).getX(), enemies.get(j).getY());
                     }
                     player.getBullets().remove(i);
                     enemies.get(j).explode();
@@ -73,10 +74,10 @@ public class Asteroids extends Canvas implements Runnable {
                 if (player.getBombs().get(i).collidesWith(enemies.get(j))) {
                     Sound bomb = new Sound("bomb");
                     s.add(enemies.get(j).returnScore());
-                    enemyCount--;
                     player.getBombs().get(i).hit();
                     if (enemies.get(j).getSize().equals("S")) {
-                        powerUpSpawner("Bomb", enemies.get(j).getX(), enemies.get(j).getY());
+                        enemyCount--;
+                        powerUpSpawner(enemies.get(j).getX(), enemies.get(j).getY());
                     }
                     if (player.getBombs().get(i).returnDone()) {
                         player.getBombs().remove(i);
@@ -120,13 +121,11 @@ public class Asteroids extends Canvas implements Runnable {
             enemies.add(new Enemy(this, new Vector2D(x, y), new Vector2D(3, 3), size));
         }
         enemyCount++;
-
     }
 
     public void gameOver() {
+        panel = new GameOverPanel(this, s, frame);
         stop();
-        GameOverPanel panel = new GameOverPanel(this, s, frame);
-        frame.remove(this);
         frame.setContentPane(panel);
         frame.pack();
     }
@@ -134,8 +133,12 @@ public class Asteroids extends Canvas implements Runnable {
     public void gameRender() {
         BufferStrategy strat = getBufferStrategy();
 
-        if (strat == null) {
-            createBufferStrategy(3);
+        if (strat == null || strat.contentsLost()) {
+            try {
+                createBufferStrategy(2);
+            } catch (Exception e) {
+            }
+
             return;
         }
 
@@ -169,26 +172,44 @@ public class Asteroids extends Canvas implements Runnable {
                 if (player.getLives() - 1 > 0) {
                     player.respawn();
                 } else {
+                    enemies = new LinkedList<>();
+                    powers = new LinkedList<>();
+                    enemyCount = 0;
                     gameOver();
                 }
             }
         }
         for (int i = 0; i < powers.size(); i++) {
             if (powers.get(i).getBounds().intersects(player.getBounds()) && player.isAlive()) {
-                if (player.getPowerUpNumber("Health") < 3 || player.getPowerUpNumber("Bomb") < 3) {
+                if ((player.getPowerUpNumber("Health") < 3 && powers.get(i).getType().equals("Health")) || (player.getPowerUpNumber("Bomb") < 3 && powers.get(i).getType().equals("Bomb"))) {
                     player.applyPowerUp(powers.get(i).getType());
                     powers.remove(i);
-                    i -= 1;
+                    if (i - 1 == -1) {
+                        i = 0;
+                    } else {
+                        i -= 1;
+                    }
                 }
             }
         }
     }
 
-    public void powerUpSpawner(String type, double x, double y) {
-        powers.add(new PowerUp(this, new Vector2D(x, y), new Vector2D(0, 0), type));
+    public void powerUpSpawner(double x, double y) {
+        String type = "";
+        if ((Math.floor(Math.random() * 4) + 1) == 1) {
+            if ((Math.floor(Math.random() * 2) + 1) == 1) {
+                type = "Health";
+            } else {
+                type = "Bomb";
+            }
+            powers.add(new PowerUp(this, new Vector2D(x, y), new Vector2D(0, 0), type));
+        }
     }
 
     public void restart() {
+        panel.setVisible(false);
+        frame.getContentPane().remove(panel);
+        s = new Score(this);
         player.reset();
         setVisible(true);
         setSize(new Dimension(1100, 700));
@@ -196,7 +217,6 @@ public class Asteroids extends Canvas implements Runnable {
         frame.setResizable(false);
         frame.setVisible(true);
         frame.setContentPane(new MainMenu(this, frame));
-        frame.add(this);
         frame.pack();
     }
 
@@ -222,11 +242,8 @@ public class Asteroids extends Canvas implements Runnable {
             if (enemyCount < 6) {
                 enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
                 enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
-                enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
                 enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
                 enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
-                enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
-                enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
                 enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
                 enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
             }
@@ -260,7 +277,6 @@ public class Asteroids extends Canvas implements Runnable {
                 fps = 0;
                 tps = 0;
             }
-            //gameOver();
         }
     }
 

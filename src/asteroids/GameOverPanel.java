@@ -8,8 +8,6 @@ import java.awt.FontFormatException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -20,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 public class GameOverPanel extends JPanel {
 
@@ -28,9 +25,7 @@ public class GameOverPanel extends JPanel {
     private Font f;
     private Score s;
     private JLabel gameOverLabel = new JLabel("GAME OVER");
-    private JTextField field = new JTextField("Enter your name here");
-    private JButton leader = new JButton();
-    private JButton play = new JButton();
+    private JButton mm = new JButton();
     private JButton quit = new JButton();
 
     public GameOverPanel(Asteroids asteroids, Score s, JFrame frame) {
@@ -47,41 +42,16 @@ public class GameOverPanel extends JPanel {
         scoreLabel.setForeground(Color.white);
         scoreLabel.setAlignmentX(CENTER_ALIGNMENT);
         
-        //makes the font
-        field.setFont(returnFont(75f));
-        field.setBorder(null);
-        field.setCaretColor(Color.white);
-        field.requestFocusInWindow();
-        field.setForeground(Color.white);
-        field.setBackground(Color.black);
-        field.setHorizontalAlignment(JTextField.CENTER);
-        field.setPreferredSize(new Dimension(1100, 100));
-        field.setMaximumSize(field.getPreferredSize());
-        field.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                if (field.getText().length() >= 3)                {
-                    e.consume();
-                }
-                char keyChar = e.getKeyChar();
-                if (Character.isLowerCase(keyChar)) {
-                    e.setKeyChar(Character.toUpperCase(keyChar));
-                }
-            }
-        });
-        
         //alligning all the buttons
-        play.setMargin(new Insets(0, 0, 0, 0));
-        play.setAlignmentX(CENTER_ALIGNMENT);
-        play.addActionListener(new ActionListener() {
+        mm.setMargin(new Insets(0, 0, 0, 0));
+        mm.setAlignmentX(CENTER_ALIGNMENT);
+        mm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
                 asteroids.restart();
             }
         });
-
-        leader.setMargin(new Insets(0, 0, 0, 0));
-        leader.setAlignmentX(CENTER_ALIGNMENT);
 
         quit.setMargin(new Insets(0, 0, 0, 0));
         quit.setAlignmentX(CENTER_ALIGNMENT);
@@ -94,15 +64,13 @@ public class GameOverPanel extends JPanel {
 
         try {
             //loads images for buttons
-            play.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\play.png"))));
-            leader.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\leader.png"))));
+            mm.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\main.png"))));
             quit.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\quit.png"))));
         } catch (IOException ex) {
         }
         
         //adds button to same panel
-        btnPanel.add(play);
-        btnPanel.add(leader);
+        btnPanel.add(mm);
         btnPanel.add(quit);
         btnPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 75, 0));
         btnPanel.setBackground(Color.black);
@@ -110,11 +78,9 @@ public class GameOverPanel extends JPanel {
         //adds all panels to main panel
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         add(gameOverLabel);
-        add(Box.createRigidArea(new Dimension(0, 125)));
-        add(field);
-        add(Box.createRigidArea(new Dimension(0, 40)));
+        add(Box.createRigidArea(new Dimension(0, 150)));
         add(scoreLabel);
-        add(Box.createRigidArea(new Dimension(0, 50)));
+        add(Box.createRigidArea(new Dimension(0, 200)));
         add(btnPanel);
         setPreferredSize(new Dimension(asteroids.getWidth(), asteroids.getHeight()));
         setBackground(Color.black);

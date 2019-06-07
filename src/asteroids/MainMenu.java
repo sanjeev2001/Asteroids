@@ -18,7 +18,6 @@ public class MainMenu extends JPanel {
     protected final Asteroids asteroids;
     private JButton play = new JButton();
     private JButton quit = new JButton();
-    private JButton leader = new JButton();
     private JLayeredPane pane = new JLayeredPane();
     private JLabel bg = new JLabel();
     private JLabel title = new JLabel();
@@ -31,15 +30,13 @@ public class MainMenu extends JPanel {
         pane.setBounds(0, 0, 1100, 700);
         bg.setBounds(0, 0, 1100, 700);
         play.setBounds(1100 / 2 - 200 / 2, 300, 200, 60);
-        leader.setBounds(1100 / 2 - 450 / 2, 400, 450, 60);
-        quit.setBounds(1100 / 2 - 200 / 2, 500, 200, 60);
+        quit.setBounds(1100 / 2 - 200 / 2, 400, 200, 60);
         Sound sound = new Sound("intro");
 
         try {
             bg.setIcon(new ImageIcon(this.getClass().getResource("titlescreen.gif"))); //Displays image on JLabel
             title.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\title.png")))); //Setting image for each button
             play.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\play.png"))));
-            leader.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\leader.png"))));
             quit.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\quit.png"))));
         } catch (IOException ex) {
         }
@@ -57,13 +54,6 @@ public class MainMenu extends JPanel {
             }
         });
 
-        leader.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-
         quit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -74,7 +64,6 @@ public class MainMenu extends JPanel {
         this.add(pane);//adds all the compoenents
         pane.add(title);
         pane.add(play);
-        pane.add(leader);
         pane.add(quit);
         this.add(bg);
 

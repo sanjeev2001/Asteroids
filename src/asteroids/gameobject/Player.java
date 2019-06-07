@@ -202,13 +202,19 @@ public class Player extends GameObject {
     }
 
     public void reset() {
+        p.x = 550;
+        p.y = 350;
+        v.x = 0;
+        v.y = 0;
         lives = 1;
+        bullets = new LinkedList<>();
         alive = true;
         invincible = false;
     }
 
     public void respawn() {
         //makes sure the player can't lose all lives at once
+        bullets = new LinkedList<>();
         alive = false;
         invincible = true;
         lives--;
