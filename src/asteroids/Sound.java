@@ -21,11 +21,10 @@ public class Sound {
 
     public Sound(String name) {
         try {
-            clip = AudioSystem.getClip();
-            // getAudioInputStream() also accepts a File or InputStream
-            AudioInputStream ais = AudioSystem.getAudioInputStream((new File(System.getProperty("user.dir") + "\\Audio\\" + name + ".wav")));
-            clip.open(ais);
-            clip.start();
+            clip = AudioSystem.getClip(); creates a clip object
+            AudioInputStream ais = AudioSystem.getAudioInputStream((new File(System.getProperty("user.dir") + "\\Audio\\" + name + ".wav")));//gets file from folder
+            clip.open(ais);//opens the stream
+            clip.start();//starts the stream
             SwingUtilities.invokeLater(() -> {
 
             });
@@ -35,6 +34,6 @@ public class Sound {
     }
 
     public void stopSound() {
-        clip.stop();
+        clip.stop();//stops the stream when called
     }
 }
