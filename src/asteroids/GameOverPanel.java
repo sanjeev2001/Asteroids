@@ -41,11 +41,13 @@ public class GameOverPanel extends JPanel {
         gameOverLabel.setFont(returnFont(100f));
         gameOverLabel.setForeground(Color.white);
         gameOverLabel.setAlignmentX(CENTER_ALIGNMENT);
-
+        
+        //makes font for the score
         scoreLabel.setFont(returnFont(100f));
         scoreLabel.setForeground(Color.white);
         scoreLabel.setAlignmentX(CENTER_ALIGNMENT);
-
+        
+        //makes the font
         field.setFont(returnFont(75f));
         field.setBorder(null);
         field.setCaretColor(Color.white);
@@ -66,14 +68,14 @@ public class GameOverPanel extends JPanel {
                 }
             }
         });
-
+        
+        //alligning all the buttons
         play.setMargin(new Insets(0, 0, 0, 0));
         play.setAlignmentX(CENTER_ALIGNMENT);
         play.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
-                //frame.removeAll();
                 asteroids.restart();
             }
         });
@@ -91,18 +93,21 @@ public class GameOverPanel extends JPanel {
         });
 
         try {
+            //loads images for buttons
             play.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\play.png"))));
             leader.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\leader.png"))));
             quit.setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\quit.png"))));
         } catch (IOException ex) {
         }
-
+        
+        //adds button to same panel
         btnPanel.add(play);
         btnPanel.add(leader);
         btnPanel.add(quit);
         btnPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 75, 0));
         btnPanel.setBackground(Color.black);
-
+        
+        //adds all panels to main panel
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         add(gameOverLabel);
         add(Box.createRigidArea(new Dimension(0, 125)));
@@ -114,7 +119,8 @@ public class GameOverPanel extends JPanel {
         setPreferredSize(new Dimension(asteroids.getWidth(), asteroids.getHeight()));
         setBackground(Color.black);
     }
-
+    
+    //imports cunstom font
     public Font returnFont(float size) {
         try {
             f = Font.createFont(Font.PLAIN, new File(System.getProperty("user.dir") + "\\Fonts\\Hyperspace.otf")).deriveFont(size);
