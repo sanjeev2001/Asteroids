@@ -22,6 +22,7 @@ public class Enemy extends GameObject {
         super(asteroids, p, v);
         this.size = size;
 
+        //loads the different images depending on size
         try {
             image = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Asteroids\\" + size + "_Asteroid_" + String.valueOf((int) Math.floor(Math.random() * 4) + 1) + ".png"));
         } catch (IOException ex) {
@@ -41,6 +42,7 @@ public class Enemy extends GameObject {
 
     public void explode() {
         switch (size) {
+            //breaks the asteroids into smaller ones
             case "L":
                 asteroids.enemySpawner("M", "Explode", p.x - 30, p.y + 30);
                 asteroids.enemySpawner("M", "Explode", p.x - 30, p.y + 30);
@@ -62,6 +64,7 @@ public class Enemy extends GameObject {
 
     @Override
     public void tick() {
+        //checks for any changes in the asteroids
         if (p.x >= asteroids.getWidth() + image.getWidth()) {
             p.x -= asteroids.getWidth();
         } else if (p.x <= -image.getWidth()) {
@@ -83,6 +86,7 @@ public class Enemy extends GameObject {
     }
 
     public int returnScore() {
+        //assigns score values for diffrent sizes
         int score = 0;
         switch (size) {
             case "L":
