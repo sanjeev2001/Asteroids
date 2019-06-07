@@ -3,6 +3,7 @@ package asteroids.gameobject;
 import asteroids.Asteroids;
 import asteroids.MouseMovement;
 import asteroids.KeyboardMovement;
+import asteroids.Sound;
 import asteroids.Vector2D;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -21,18 +22,21 @@ import javax.swing.Timer;
 public class Player extends GameObject {
 
     private boolean alive = true;
+    private Timer animationTimer;
     private LinkedList<Bullet> bullets = new LinkedList<>();
     private LinkedList<Bullet> bombs = new LinkedList<>();
     private BufferedImage bombImage = null;
     private String imageName = "";
     private int frameNumber = 1;
     private BufferedImage image = null;
-    private int lives = 3;
+    private boolean invincible = false;
+    private int invincibleTime = 0;
+    private int lives = 1;
     private BufferedImage lifeImage = null;
     private int numberOfBombs = 2;
+    private Timer respawnTimer;
     private double theta = 0;
     private double time = 0.1;
-    private Timer timer;
     private Vector2D mouseVector = new Vector2D(MouseMovement.getX(), MouseMovement.getY());
 
     public Player(Asteroids asteroids, Vector2D p, Vector2D v) {
@@ -52,12 +56,6 @@ public class Player extends GameObject {
         } else {
             numberOfBombs += 1;
         }
-    }
-
-    public void die() {
-        alive = false;
-        dyingAnimation();
-        lives--;
     }
 
     public void draw(Graphics2D graphics2D) {
@@ -99,12 +97,14 @@ public class Player extends GameObject {
                 }
                 frameNumber++;
                 if (frameNumber > 8) {
-                    timer.stop();
+                    p.x = 550;
+                    p.y = 350;
+                    animationTimer.stop();
                 }
             }
         };
-        timer = new Timer(60, ac);
-        timer.start();
+        animationTimer = new Timer(60, ac);
+        animationTimer.start();
     }
 
     public LinkedList<Bullet> getBombs() {
@@ -119,12 +119,20 @@ public class Player extends GameObject {
         return bullets;
     }
 
+    public int getLives() {
+        return lives;
+    }
+
     public int getPowerUpNumber(String type) {
         return type.equals("Health") ? lives : numberOfBombs;
     }
 
     public boolean isAlive() {
         return alive;
+    }
+
+    public boolean isInvincible() {
+        return invincible;
     }
 
     public void playerMovement(int key, boolean released) {
@@ -148,7 +156,6 @@ public class Player extends GameObject {
                     if (frameNumber != 8) {
                         frameNumber++;
                     }
-                    //System.out.println(v.x);
                     if (v.add(new Vector2D(time, time)).x <= 5) {
                         v = v.add(new Vector2D(time, time));
                     }
@@ -190,14 +197,44 @@ public class Player extends GameObject {
         }
     }
 
+    public void reset() {
+        lives = 1;
+        alive = true;
+        invincible = false;
+    }
+
+    public void respawn() {
+        alive = false;
+        invincible = true;
+        lives--;
+        dyingAnimation();
+        ActionListener ac = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                alive = true;
+                invincibleTime++;
+                v.x = 0;
+                v.y = 0;
+                if (invincibleTime > 3) {
+                    invincible = false;
+                    invincibleTime = 0;
+                    respawnTimer.stop();
+                }
+            }
+        };
+        respawnTimer = new Timer(1000, ac);
+        respawnTimer.start();
+    }
+
     public void shoot(String type) {
         if (type.equals("Bullet")) {
             if (bullets.size() >= 5) {
                 bullets.remove(0);
             }
             bullets.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - (Bullet.returnRad() / 2), p.y - 18 * Math.cos(theta)), theta, new Vector2D(10, 10), type));
+            Sound shot = new Sound("shoot");
         } else {
-            bombs.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - (Bullet.returnRad() / 2), p.y - 18 * Math.cos(theta)), theta, new Vector2D(2, 2), type));
+            bombs.add(new Bullet(asteroids, new Vector2D(p.x + 18 * Math.sin(theta) - (Bullet.returnRad() / 2), p.y - 18 * Math.cos(theta)), theta, new Vector2D(5, 5), type));
             bombs.get(bombs.size() - 1).bombTimer("Flashing");
         }
     }
@@ -213,17 +250,19 @@ public class Player extends GameObject {
                 mouseMove();
             }
 
-            if (KeyboardMovement.isDown(KeyEvent.VK_W) || KeyboardMovement.isDown(KeyEvent.VK_UP)) {
-                if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
+            if (!invincible) {
+                if (KeyboardMovement.isDown(KeyEvent.VK_W) || KeyboardMovement.isDown(KeyEvent.VK_UP)) {
+                    if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
+                        playerMovement(KeyEvent.VK_A, false);
+                    } else if (KeyboardMovement.isDown(KeyEvent.VK_D) || KeyboardMovement.isDown(KeyEvent.VK_RIGHT)) {
+                        playerMovement(KeyEvent.VK_D, false);
+                    }
+                    playerMovement(KeyEvent.VK_W, false);
+                } else if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
                     playerMovement(KeyEvent.VK_A, false);
                 } else if (KeyboardMovement.isDown(KeyEvent.VK_D) || KeyboardMovement.isDown(KeyEvent.VK_RIGHT)) {
                     playerMovement(KeyEvent.VK_D, false);
                 }
-                playerMovement(KeyEvent.VK_W, false);
-            } else if (KeyboardMovement.isDown(KeyEvent.VK_A) || KeyboardMovement.isDown(KeyEvent.VK_LEFT)) {
-                playerMovement(KeyEvent.VK_A, false);
-            } else if (KeyboardMovement.isDown(KeyEvent.VK_D) || KeyboardMovement.isDown(KeyEvent.VK_RIGHT)) {
-                playerMovement(KeyEvent.VK_D, false);
             }
 
             if (!KeyboardMovement.isDown(KeyEvent.VK_W) && !KeyboardMovement.isDown(KeyEvent.VK_UP)) {

@@ -1,6 +1,5 @@
 package asteroids;
 
-import asteroids.gameobject.Bullet;
 import asteroids.gameobject.Enemy;
 import asteroids.gameobject.Player;
 import asteroids.gameobject.PowerUp;
@@ -19,6 +18,7 @@ public class Asteroids extends Canvas implements Runnable {
     private Player player = new Player(this, new Vector2D(550, 350), new Vector2D(0, 0));
     private LinkedList<Enemy> enemies = new LinkedList<>();
     private final JFrame frame = new JFrame("Asteroids");
+    private KeyboardMovement kl = new KeyboardMovement();
     private LinkedList<PowerUp> powers = new LinkedList<>();
     private boolean run = false;
     private Random r = new Random();
@@ -26,7 +26,8 @@ public class Asteroids extends Canvas implements Runnable {
     public int enemyCount = 0;
 
     public Asteroids() {
-        addKeyListener(new KeyboardMovement());
+        MainMenu mm = new MainMenu(this, frame);
+        addKeyListener(kl);
         MouseMovement mListener = new MouseMovement(this);
         addMouseListener(mListener);
         addMouseMotionListener(mListener);
@@ -34,29 +35,31 @@ public class Asteroids extends Canvas implements Runnable {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setVisible(true);
-        frame.add(this);
+        frame.setContentPane(mm);
         frame.pack();
-        start();
     }
 
     public void bulletCollisions() {
         for (int i = 0; i < player.getBullets().size(); i++) {
             for (int j = 0; j < enemies.size(); j++) {
                 if (player.getBullets().get(i).collidesWith(enemies.get(j))) {
-//                    if (enemies.get(j).getSize().equals("L")) {
-//                        enemyCount--;
-//                    }
+                    Sound hit = new Sound("hit");
+                    s.add(enemies.get(j).returnScore());
+                    enemyCount--;
                     if (enemies.get(j).getSize().equals("S")) {
                         powerUpSpawner("Bomb", enemies.get(j).getX(), enemies.get(j).getY());
                     }
                     player.getBullets().remove(i);
                     enemies.get(j).explode();
                     enemies.remove(j);
-                    s.add(1);
                     if (player.getBullets().size() == 0) {
                         break;
                     }
-                    i -= 1;
+                    if (i - 1 == -1) {
+                        i = 0;
+                    } else {
+                        i -= 1;
+                    }
 
                 }
                 if (player.getBullets().size() == 0) {
@@ -68,22 +71,25 @@ public class Asteroids extends Canvas implements Runnable {
         for (int i = 0; i < player.getBombs().size(); i++) {
             for (int j = 0; j < enemies.size(); j++) {
                 if (player.getBombs().get(i).collidesWith(enemies.get(j))) {
-                    player.getBombs().get(i).stopTimer();
+                    Sound bomb = new Sound("bomb");
+                    s.add(enemies.get(j).returnScore());
+                    enemyCount--;
+                    player.getBombs().get(i).hit();
                     if (enemies.get(j).getSize().equals("S")) {
                         powerUpSpawner("Bomb", enemies.get(j).getX(), enemies.get(j).getY());
                     }
-                    if (player.getBombs().get(i).getCount() < 30) {
-                        //player.getBombs().set(i, new Bullet(this, new Vector2D(player.getBombs().get(i).getX(), player.getBombs().get(i).getY()), 0, new Vector2D(0, 0), "Bomb"));
-                        player.getBombs().get(i).hit();
+                    if (player.getBombs().get(i).returnDone()) {
+                        player.getBombs().remove(i);
                     }
-                    //player.getBombs().remove(i);
                     enemies.remove(j);
-                    s.add(1);
                     if (player.getBombs().size() == 0) {
                         break;
                     }
-                    i -= 1;
-
+                    if (i - 1 == -1) {
+                        i = 0;
+                    } else {
+                        i -= 1;
+                    }
                 }
                 if (player.getBombs().size() == 0) {
                     break;
@@ -93,8 +99,36 @@ public class Asteroids extends Canvas implements Runnable {
     }
 
     public void enemySpawner(String size, String type, double x, double y) {
+        if (type.equals("Random")) {
+            double side = Math.floor(Math.random() * 4) + 1;
+            double rx = 0, ry = 0;
+            if (side == 1.0) {
+                rx = r.nextDouble() * getWidth();
+                ry = -51;
+            } else if (side == 2.0) {
+                rx = getWidth() + 71;
+                ry = r.nextDouble() * getHeight();
+            } else if (side == 3.0) {
+                rx = r.nextDouble() * getWidth();
+                ry = getHeight() + 51;
+            } else {
+                rx = -71;
+                ry = r.nextDouble() * getHeight();
+            }
+            enemies.add(new Enemy(this, new Vector2D(rx, ry), new Vector2D(3, 3), size));
+        } else {
+            enemies.add(new Enemy(this, new Vector2D(x, y), new Vector2D(3, 3), size));
+        }
         enemyCount++;
-        enemies.add(new Enemy(this, new Vector2D(x, y), new Vector2D(0, 0), size));
+
+    }
+
+    public void gameOver() {
+        stop();
+        GameOverPanel panel = new GameOverPanel(this, s, frame);
+        frame.remove(this);
+        frame.setContentPane(panel);
+        frame.pack();
     }
 
     public void gameRender() {
@@ -130,8 +164,13 @@ public class Asteroids extends Canvas implements Runnable {
 
     public void playerCollisions() {
         for (int i = 0; i < enemies.size(); i++) {
-            if (enemies.get(i).getBounds().intersects(player.getBounds()) && player.isAlive()) {
-                player.die();
+            if (enemies.get(i).getBounds().intersects(player.getBounds()) && player.isAlive() && !player.isInvincible()) {
+                Sound ded = new Sound("ded");
+                if (player.getLives() - 1 > 0) {
+                    player.respawn();
+                } else {
+                    gameOver();
+                }
             }
         }
         for (int i = 0; i < powers.size(); i++) {
@@ -147,6 +186,18 @@ public class Asteroids extends Canvas implements Runnable {
 
     public void powerUpSpawner(String type, double x, double y) {
         powers.add(new PowerUp(this, new Vector2D(x, y), new Vector2D(0, 0), type));
+    }
+
+    public void restart() {
+        player.reset();
+        setVisible(true);
+        setSize(new Dimension(1100, 700));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        frame.setVisible(true);
+        frame.setContentPane(new MainMenu(this, frame));
+        frame.add(this);
+        frame.pack();
     }
 
     @Override
@@ -167,13 +218,17 @@ public class Asteroids extends Canvas implements Runnable {
             lastUpdate = now;
 
             MouseMovement.update();
-            if (enemyCount == 0) {
+
+            if (enemyCount < 6) {
                 enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
-//                enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
-//                enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
-//                enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
-//                enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
-//                enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("L", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("M", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
+                enemySpawner("S", "Random", r.nextDouble() * getWidth(), r.nextDouble() * getHeight());
             }
 
             bulletCollisions();
@@ -205,7 +260,7 @@ public class Asteroids extends Canvas implements Runnable {
                 fps = 0;
                 tps = 0;
             }
-
+            //gameOver();
         }
     }
 

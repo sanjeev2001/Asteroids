@@ -17,7 +17,7 @@ public class Score {
     public Score(Asteroids asteroids) {
         this.asteroids = asteroids;
         try {
-            f = Font.createFont(Font.PLAIN, new File(System.getProperty("user.dir") + "\\Fonts\\Score.ttf")).deriveFont(25f);
+            f = Font.createFont(Font.PLAIN, new File(System.getProperty("user.dir") + "\\Fonts\\Hyperspace.otf")).deriveFont(40f);
         } catch (FontFormatException ex) {
             System.out.println("Font not valid");
         } catch (IOException ex) {
@@ -32,7 +32,11 @@ public class Score {
 
     public void draw(Graphics2D graphics2D) {
         graphics2D.setColor(Color.WHITE);
-        graphics2D.drawString(String.valueOf(value), (int) (1100 - graphics2D.getFontMetrics(f).getStringBounds(String.valueOf(value), graphics2D).getWidth()), (int) (5 + graphics2D.getFontMetrics(f).getHeight()));
+        graphics2D.drawString(String.valueOf(value), (int) (1100 - graphics2D.getFontMetrics(f).getStringBounds(String.valueOf(value), graphics2D).getWidth()), (int) (- 15 + graphics2D.getFontMetrics(f).getHeight()));
+    }
+
+    public int getScore() {
+        return value;
     }
 
 }

@@ -15,12 +15,13 @@ public class Enemy extends GameObject {
 
     private double theta;
     private BufferedImage image = null;
+    private Random r = new Random();
     private String size;
 
     public Enemy(Asteroids asteroids, Vector2D p, Vector2D v, String size) {
         super(asteroids, p, v);
         this.size = size;
-        Random r = new Random();
+
         try {
             image = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Asteroids\\" + size + "_Asteroid_" + String.valueOf((int) Math.floor(Math.random() * 4) + 1) + ".png"));
         } catch (IOException ex) {
@@ -47,6 +48,10 @@ public class Enemy extends GameObject {
             case "M":
                 asteroids.enemySpawner("S", "Explode", p.x - 20, p.y + 20);
                 asteroids.enemySpawner("S", "Explode", p.x - 20, p.y + 20);
+                break;
+
+            case "S":
+                asteroids.enemySpawner("L", "Random", r.nextDouble() * asteroids.getWidth(), r.nextDouble() * asteroids.getHeight());
                 break;
         }
     }
@@ -75,5 +80,21 @@ public class Enemy extends GameObject {
 
     public Rectangle getBounds() {
         return new Rectangle((int) p.x - image.getWidth() / 2, (int) p.y - image.getHeight() / 2, image.getWidth() + 1, image.getHeight() + 1);
+    }
+
+    public int returnScore() {
+        int score = 0;
+        switch (size) {
+            case "L":
+                score = 20;
+                break;
+            case "M":
+                score = 50;
+                break;
+            case "S":
+                score = 100;
+                break;
+        }
+        return score;
     }
 }
