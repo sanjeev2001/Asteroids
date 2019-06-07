@@ -34,6 +34,7 @@ public class Bullet extends GameObject {
         super(asteroids, p, v);
         this.theta = theta;
         this.type = type;
+        //loads the bomb images
         if (type.equals("Bullet")) {
             setRad(5);
         } else {
@@ -50,6 +51,7 @@ public class Bullet extends GameObject {
     }
 
     public void bombTimer(String type) {
+        //counts till bomb explosion
         ActionListener ac = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -61,6 +63,7 @@ public class Bullet extends GameObject {
                         colour = Color.BLACK;
                     }
                     if (animate && !done) {
+                        //loads the different parts fo the exploion
                         try {
                             image = ImageIO.read(new File(System.getProperty("user.dir") + "\\Graphics\\Misc\\Bomb_" + frameNumber + ".png"));
                         } catch (IOException ex) {
@@ -85,7 +88,6 @@ public class Bullet extends GameObject {
         if (type.equals("Bomb")) {
             graphics2D.setColor(colour);
         }
-        //graphics2D.draw(getBounds());
         if (type.equals("Bomb") && (count >= 5 && count <= 10 && !hit) || (count <= 10 + hitTime && hit) && !done) {
             graphics2D.drawImage(image, (int) (p.x - 20), (int) (p.y - 20), asteroids);
         } else {
@@ -103,6 +105,7 @@ public class Bullet extends GameObject {
     }
 
     public void hit() {
+        //check for hits
         hitTime = Integer.valueOf(count);
         hit = true;
     }
@@ -126,7 +129,7 @@ public class Bullet extends GameObject {
 
     @Override
     public void tick() {
-        //System.out.println(done);
+        //checks for changes in the bullets and bombs
         p.x += v.x * Math.sin(theta);
         p.y -= v.y * Math.cos(theta);
         if (type.equals("Bomb") && (count >= 5 && count <= 10 && !hit) || (count <= 10 + hitTime && hit)) {
@@ -134,15 +137,12 @@ public class Bullet extends GameObject {
             v.x = 0;
             v.y = 0;
             r = new Rectangle((int) (p.x - 25), (int) (p.y - 25), (int) radX + 50, (int) radY + 50);
-            //System.out.println("1");
         } else if ((count > 10 && !hit) || (count >= 10 + hitTime && hit)) {
             v.x = 0;
             v.y = 0;
             r = new Rectangle();
-            //System.out.println("2");
         } else {
             r = new Rectangle((int) p.x, (int) p.y, (int) radX, (int) radY);
-            //System.out.println("3");
         }
     }
 }
