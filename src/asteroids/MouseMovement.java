@@ -20,20 +20,22 @@ public class MouseMovement extends MouseAdapter {
     public MouseMovement(Asteroids asteroids) {
         this.asteroids = asteroids;
     }
-
+    //If the mouse is moved, set the x and y variables for movement purposes to the x and y location of the where the cursor is
     @Override
     public void mouseMoved(MouseEvent e) {
         mouseInside = true;
         mouseX = e.getX();
         mouseY = e.getY();
     }
-
+    
+    //If the mouse is pressed, fire a bullet
     @Override
     public void mousePressed(MouseEvent e) {
         buttons[e.getButton()] = true;
         //bullets.add(new Ellipse2D.Double(10 * Math.cos(Math.toRadians(360) - theta) + x + 10, 10 * Math.sin(Math.toRadians(360) - theta) + y + 10, 5, 5));
     }
 
+    //When the mouse button is released, stop firing
     @Override
     public void mouseReleased(MouseEvent e) {
         buttons[e.getButton()] = false;
