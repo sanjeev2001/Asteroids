@@ -31,7 +31,7 @@ public class Player extends GameObject {
     private BufferedImage image = null;
     private boolean invincible = false;
     private int invincibleTime = 0;
-    private int lives = 1;
+    private int lives = 3;
     private BufferedImage lifeImage = null;
     private int numberOfBombs = 2;
     private Timer respawnTimer;
@@ -41,6 +41,7 @@ public class Player extends GameObject {
 
     public Player(Asteroids asteroids, Vector2D p, Vector2D v) {
         super(asteroids, p, v);
+        //loads images for the player
         imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Ship_" + frameNumber + ".png";
         try {
             image = ImageIO.read(new File(imageName));
@@ -51,6 +52,7 @@ public class Player extends GameObject {
     }
 
     public void applyPowerUp(String type) {
+        //adds the power up to the player
         if (type.equals("Health")) {
             lives += 1;
         } else {
@@ -63,7 +65,7 @@ public class Player extends GameObject {
         at.setToTranslation(p.x - image.getWidth() / 2, p.y - image.getHeight() / 2);
         at.rotate(theta, (image.getWidth() / 2) + 1, (image.getHeight() / 2) + 1);
         graphics2D.setColor(Color.white);
-
+        //finds the heading of the player and spawns bullets and bombs acordingly
         for (int i = 0; i < bullets.size(); i++) {
             bullets.get(i).draw(graphics2D);
         }
@@ -96,6 +98,7 @@ public class Player extends GameObject {
                 } catch (IOException ex) {
                 }
                 frameNumber++;
+                //respawns player in the center
                 if (frameNumber > 8) {
                     p.x = 550;
                     p.y = 350;
@@ -134,7 +137,7 @@ public class Player extends GameObject {
     public boolean isInvincible() {
         return invincible;
     }
-
+    //moves the player accoring to the mouse and key inputs
     public void playerMovement(int key, boolean released) {
         if (p.x >= asteroids.getWidth() + image.getWidth()) {
             p.x -= asteroids.getWidth();
@@ -179,6 +182,7 @@ public class Player extends GameObject {
     }
 
     public void mouseMove() {
+        //checks mouse movement
         boolean deadzone = !(MouseMovement.getX() >= p.x - 25 && MouseMovement.getX() <= p.x + image.getHeight() + 25 && MouseMovement.getY() >= p.y - 25 && MouseMovement.getY() <= p.y + image.getHeight() + 25);
         mouseVector.setX(MouseMovement.getX());
         mouseVector.setY(MouseMovement.getY());
@@ -204,6 +208,7 @@ public class Player extends GameObject {
     }
 
     public void respawn() {
+        //makes sure the player can't lose all lives at once
         alive = false;
         invincible = true;
         lives--;
@@ -240,6 +245,7 @@ public class Player extends GameObject {
     }
 
     public void tick() {
+        //checks for any change in player
         if (alive) {
             imageName = System.getProperty("user.dir") + "\\Graphics\\Ship\\Ship_" + frameNumber + ".png";
             try {
