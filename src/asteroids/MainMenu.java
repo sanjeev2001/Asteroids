@@ -44,16 +44,16 @@ public class MainMenu extends JPanel {
         } catch (IOException ex) {
         }
 
-        this.add(pane);
+        this.add(pane);//Adds transparent panel over Jlabel
 
         play.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                bg.setVisible(false);
+                bg.setVisible(false);//gets rid of existing components on panel
                 pane.setVisible(false);
                 sound.stopSound();
                 frame.add(asteroids);
-                asteroids.start();
+                asteroids.start();//starts the game once play button is clicked
             }
         });
 
@@ -67,11 +67,11 @@ public class MainMenu extends JPanel {
         quit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                frame.dispose();
+                frame.dispose();//closes game
             }
         });
 
-        this.add(pane);
+        this.add(pane);//adds all the compoenents
         pane.add(title);
         pane.add(play);
         pane.add(leader);
